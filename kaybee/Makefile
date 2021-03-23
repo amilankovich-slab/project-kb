@@ -4,7 +4,7 @@ $(eval NOW = $(shell date))
 
 # Go parameters
 GOCMD=go
-GOBUILD=$(GOCMD) build
+GOBUILD=$(GOCMD) build -mod=mod
 GOCLEAN=$(GOCMD) clean
 GOTEST=$(GOCMD) test
 GOGET=$(GOCMD) get
@@ -14,9 +14,12 @@ BINARY_UNIX=$(BINARY_NAME)-$(VERSION)_linux-amd64
 BINARY_WINDOWS=$(BINARY_NAME)-$(VERSION)_win-amd64
 BINARY_MACOS=$(BINARY_NAME)-$(VERSION)_darwin-amd64
 
-all: lint vet test build #ui
+all: env lint vet test build #ui
 
-build:  pkged.go fmt
+env:
+	$(GOCMD) env -w GO111MODULE=auto
+
+build:  env pkged.go fmt
 	$(GOBUILD) $(LDFLAGS) -o $(BINARY_NAME) -v
 
 pkged.go: internal/tasks/data/default_config.yaml
